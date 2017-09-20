@@ -63,9 +63,9 @@ device_info* deviceHandler_FTP_info() {
 void readDeviceInfoFTP() {
 	struct statvfs buf;
 	memset(&buf, 0, sizeof(statvfs));
-	DrawFrameStart();
-	DrawMessageBox(D_INFO,"Reading filesystem info for ftp:/");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawMessageBox(D_INFO,"Reading filesystem info for ftp:/");
+	//DrawFrameFinish();
 	
 	int res = statvfs("ftp:/", &buf);
 	initial_FTP_info.freeSpaceInKB = !res ? (u32)((uint64_t)((uint64_t)buf.f_bsize*(uint64_t)buf.f_bfree)/1024LL):0;
@@ -92,19 +92,19 @@ s32 deviceHandler_FTP_readDir(file_handle* ffile, file_handle** dir, u32 type){
    
 	// We need at least a share name and ip addr in the settings filled out
 	if(!strlen(&swissSettings.ftpHostIp[0])) {
-		DrawFrameStart();
-		sprintf(txtbuffer, "Check FTP Configuration in swiss.ini");
-		DrawMessageBox(D_FAIL,txtbuffer);
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//sprintf(txtbuffer, "Check FTP Configuration in swiss.ini");
+		//DrawMessageBox(D_FAIL,txtbuffer);
+		//DrawFrameFinish();
 		wait_press_A();
 		return SMB_SMBCFGERR;
 	}
 
 	if(!net_initialized) {       //Init if we have to
-		DrawFrameStart();
-		sprintf(txtbuffer, "Network has not been initialised yet");
-		DrawMessageBox(D_FAIL,txtbuffer);
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//sprintf(txtbuffer, "Network has not been initialised yet");
+		//DrawMessageBox(D_FAIL,txtbuffer);
+		//DrawFrameFinish();
 		wait_press_A();
 		return SMB_NETINITERR;
 	} 
@@ -112,10 +112,10 @@ s32 deviceHandler_FTP_readDir(file_handle* ffile, file_handle** dir, u32 type){
 	if(!ftp_initialized) {       //Connect to the FTP
 		init_ftp();
 		if(!ftp_initialized) {
-			DrawFrameStart();
-			sprintf(txtbuffer, "Error initialising FTP");
-			DrawMessageBox(D_FAIL,txtbuffer);
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//sprintf(txtbuffer, "Error initialising FTP");
+			//DrawMessageBox(D_FAIL,txtbuffer);
+			//DrawFrameFinish();
 			wait_press_A();
 			return SMB_SMBERR; //fail
 		}
@@ -219,11 +219,16 @@ bool deviceHandler_FTP_test() {
 	return exi_bba_exists();
 }
 
+deviceImage ftpImage = {(void *)samba_tpl, 0, 160, 85};
+deviceImage* deviceHandler_FTP_deviceImage() {
+	ftpImage.tplSize = samba_tpl_size;
+	return &ftpImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_ftp = {
 	DEVICE_ID_D,
 	"FTP via BBA",
 	"Must be pre-configured via swiss.ini",
-	{TEX_SAMBA, 160, 85},
 	FEAT_READ,
 	LOC_SERIAL_PORT_1,
 	&initial_FTP,
@@ -237,5 +242,6 @@ DEVICEHANDLER_INTERFACE __device_ftp = {
 	(_fn_seekFile)&deviceHandler_FTP_seekFile,
 	(_fn_setupFile)NULL,
 	(_fn_closeFile)&deviceHandler_FTP_closeFile,
-	(_fn_deinit)&deviceHandler_FTP_deinit
+	(_fn_deinit)&deviceHandler_FTP_deinit,
+	(_fn_deviceImage)&deviceHandler_FTP_deviceImage
 };

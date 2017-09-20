@@ -98,9 +98,9 @@ s32 deviceHandler_Qoob_setupFile(file_handle* file, file_handle* file2) {
 
 s32 deviceHandler_Qoob_init(file_handle* file){
 		
-	DrawFrameStart();
-	DrawMessageBox(D_INFO,"Reading Qoob");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawMessageBox(D_INFO,"Reading Qoob");
+	//DrawFrameFinish();
 	ipl_set_config(0);
 	return 1;
 }
@@ -142,11 +142,16 @@ bool deviceHandler_Qoob_test() {
 	return qoobFound;
 }
 
+deviceImage qoobImage = {(void *)qoob_tpl, 0, 70, 80};
+deviceImage* deviceHandler_Qoob_deviceImage() {
+	qoobImage.tplSize = qoob_tpl_size;
+	return &qoobImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_qoob = {
 	DEVICE_ID_7,
 	"Qoob Pro",
 	"Qoob Pro Flash File System",
-	{TEX_QOOB, 70, 80},
 	FEAT_READ,
 	LOC_SYSTEM,
 	&initial_Qoob,
@@ -160,5 +165,6 @@ DEVICEHANDLER_INTERFACE __device_qoob = {
 	(_fn_seekFile)&deviceHandler_Qoob_seekFile,
 	(_fn_setupFile)NULL,
 	(_fn_closeFile)&deviceHandler_Qoob_closeFile,
-	(_fn_deinit)&deviceHandler_Qoob_deinit
+	(_fn_deinit)&deviceHandler_Qoob_deinit,
+	(_fn_deviceImage)&deviceHandler_Qoob_deviceImage
 };

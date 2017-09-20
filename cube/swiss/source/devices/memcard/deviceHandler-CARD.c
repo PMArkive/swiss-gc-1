@@ -470,9 +470,9 @@ s32 deviceHandler_CARD_deleteFile(file_handle* file) {
 	
 	int ret = CARD_DeleteEntry(slot, cd);
 	if(ret != CARD_ERROR_READY) {
-		DrawFrameStart();
-		DrawMessageBox(D_FAIL,cardError(ret));
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//DrawMessageBox(D_FAIL,cardError(ret));
+		//DrawFrameFinish();
 		wait_press_A();
 	}
 	return ret;
@@ -492,11 +492,16 @@ bool deviceHandler_CARD_test_b() {
 	return ((initialize_card(1)==CARD_ERROR_READY) && (CARD_ProbeEx(1, &memSize,&sectSize)==CARD_ERROR_READY));
 }
 
+deviceImage cardImage = {(void *)memcard_tpl, 0, 107, 80};
+deviceImage* deviceHandler_CARD_deviceImage() {
+	cardImage.tplSize = memcard_tpl_size;
+	return &cardImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_card_a = {
 	DEVICE_ID_5,
 	"Memory Card - Slot A",
 	"Backup & Restore save games",
-	{TEX_MEMCARD, 107, 80},
 	FEAT_READ|FEAT_WRITE|FEAT_BOOT_DEVICE,
 	LOC_MEMCARD_SLOT_A,
 	&initial_CARDA,
@@ -510,14 +515,14 @@ DEVICEHANDLER_INTERFACE __device_card_a = {
 	(_fn_seekFile)&deviceHandler_CARD_seekFile,
 	(_fn_setupFile)&deviceHandler_CARD_setupFile,
 	(_fn_closeFile)&deviceHandler_CARD_closeFile,
-	(_fn_deinit)&deviceHandler_CARD_deinit
+	(_fn_deinit)&deviceHandler_CARD_deinit,
+	(_fn_deviceImage)&deviceHandler_CARD_deviceImage
 };
 
 DEVICEHANDLER_INTERFACE __device_card_b = {
 	DEVICE_ID_6,
 	"Memory Card - Slot B",
 	"Backup & Restore save games",
-	{TEX_MEMCARD, 107, 80},
 	FEAT_READ|FEAT_WRITE|FEAT_BOOT_DEVICE,
 	LOC_MEMCARD_SLOT_B,
 	&initial_CARDB,
@@ -531,5 +536,6 @@ DEVICEHANDLER_INTERFACE __device_card_b = {
 	(_fn_seekFile)&deviceHandler_CARD_seekFile,
 	(_fn_setupFile)&deviceHandler_CARD_setupFile,
 	(_fn_closeFile)&deviceHandler_CARD_closeFile,
-	(_fn_deinit)&deviceHandler_CARD_deinit
+	(_fn_deinit)&deviceHandler_CARD_deinit,
+	(_fn_deviceImage)&deviceHandler_CARD_deviceImage
 };

@@ -52,7 +52,6 @@ char txtbuffer[2048];           //temporary text buffer
 file_handle curFile;    //filedescriptor for current file
 file_handle curDir;     //filedescriptor for current directory
 int SDHCCard = 0; //0 == SDHC, 1 == normal SD
-char *videoStr = NULL;
 int current_view_start = 0;
 int current_view_end = 0;
 
@@ -289,13 +288,13 @@ void drawCurrentDevice() {
 
 	DrawTransparentBox(30, 100, 135, 200);	// Device icon + slot box
 	// Draw the device image
-	float scale = 80.0f / (float)MAX(devices[DEVICE_CUR]->deviceTexture.width, devices[DEVICE_CUR]->deviceTexture.height);
-	int scaledWidth = devices[DEVICE_CUR]->deviceTexture.width*scale;
-	int scaledHeight = devices[DEVICE_CUR]->deviceTexture.height*scale;
-	DrawImage(devices[DEVICE_CUR]->deviceTexture.textureId
-				, 30 + ((135-30) / 2) - (scaledWidth/2), 95 + ((200-100) /2) - (scaledHeight/2)	// center x,y
-				, scaledWidth, scaledHeight, // scaled image
-				0, 0.0f, 1.0f, 0.0f, 1.0f, 0);
+	float scale = 0;//80.0f / (float)MAX(devices[DEVICE_CUR]->deviceTexture.width, devices[DEVICE_CUR]->deviceTexture.height);
+	int scaledWidth = 0;//devices[DEVICE_CUR]->deviceTexture.width*scale;
+	int scaledHeight = 0;//devices[DEVICE_CUR]->deviceTexture.height*scale;
+//DrawImage(devices[DEVICE_CUR]->deviceTexture.textureId
+//			, 30 + ((135-30) / 2) - (scaledWidth/2), 95 + ((200-100) /2) - (scaledHeight/2)	// center x,y
+//			, scaledWidth, scaledHeight, // scaled image
+//			0, 0.0f, 1.0f, 0.0f, 1.0f, 0);
 	if(devices[DEVICE_CUR]->location == LOC_MEMCARD_SLOT_A)
 		sprintf(txtbuffer, "%s", "Slot A");
 	else if(devices[DEVICE_CUR]->location == LOC_MEMCARD_SLOT_B)
@@ -1544,8 +1543,8 @@ void select_device(int type)
 		DrawEmptyBox(20,190, vmode->fbWidth-20, 410, COLOR_BLACK);
 		WriteFontStyled(640/2, 195, type == DEVICE_DEST ? "Destination Device" : "Device Selection", 1.0f, true, defaultColor);
 
-		textureImage *deviceImage = &allDevices[curDevice]->deviceTexture;
-		DrawImage(deviceImage->textureId, 640/2, 230, deviceImage->width, deviceImage->height, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1);
+		//textureImage *deviceImage = &allDevices[curDevice]->deviceTexture;
+		//DrawImage(deviceImage->textureId, 640/2, 230, deviceImage->width, deviceImage->height, 0, 0.0f, 1.0f, 0.0f, 1.0f, 1);
 		WriteFontStyled(640/2, 330, (char*)allDevices[curDevice]->deviceName, 0.85f, true, defaultColor);
 		WriteFontStyled(640/2, 350, (char*)allDevices[curDevice]->deviceDescription, 0.65f, true, defaultColor);
 

@@ -90,7 +90,7 @@ void info_draw_page(int page_num) {
 		else
 			sprintf(topStr, "No DVD Drive present");
 		WriteFontStyled(640/2, 170, topStr, 1.0f, true, defaultColor);
-		sprintf(topStr, "%s",videoStr);
+		sprintf(topStr, "%s",getVideoStr(vmode));
 		WriteFontStyled(640/2, 200, topStr, 1.0f, true, defaultColor);
 		sprintf(topStr,"%s / %s",getSramLang(sram->lang), sram->flags&4 ? "Stereo":"Mono");
 		WriteFontStyled(640/2, 230, topStr, 1.0f, true, defaultColor);

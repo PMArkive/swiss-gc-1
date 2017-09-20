@@ -28,26 +28,6 @@
 
 TPLFile backdropTPL;
 GXTexObj backdropTexObj;
-TPLFile gcdvdsmallTPL;
-GXTexObj gcdvdsmallTexObj;
-TPLFile sdsmallTPL;
-GXTexObj sdsmallTexObj;
-TPLFile hddTPL;
-GXTexObj hddTexObj;
-TPLFile qoobTPL;
-GXTexObj qoobTexObj;
-TPLFile wodeimgTPL;
-GXTexObj wodeimgTexObj;
-TPLFile usbgeckoTPL;
-GXTexObj usbgeckoTexObj;
-TPLFile memcardTPL;
-GXTexObj memcardTexObj;
-TPLFile sambaTPL;
-GXTexObj sambaTexObj;
-TPLFile wiikeyTPL;
-GXTexObj wiikeyTexObj;
-TPLFile systemTPL;
-GXTexObj systemTexObj;
 TPLFile btnnohilightTPL;
 GXTexObj btnnohilightTexObj;
 TPLFile btnhilightTPL;
@@ -79,58 +59,38 @@ GXTexObj uncheckedTexObj;
 
 void init_textures() 
 {
-	TPL_OpenTPLFromMemory(&backdropTPL, (void *)backdrop_tpl, backdrop_tpl_size);
-	TPL_GetTexture(&backdropTPL,backdrop,&backdropTexObj);
-	TPL_OpenTPLFromMemory(&gcdvdsmallTPL, (void *)gcdvdsmall_tpl, gcdvdsmall_tpl_size);
-	TPL_GetTexture(&gcdvdsmallTPL,gcdvdsmall,&gcdvdsmallTexObj);
-	TPL_OpenTPLFromMemory(&sdsmallTPL, (void *)sdsmall_tpl, sdsmall_tpl_size);
-	TPL_GetTexture(&sdsmallTPL,sdsmall,&sdsmallTexObj);
-	TPL_OpenTPLFromMemory(&hddTPL, (void *)hdd_tpl, hdd_tpl_size);
-	TPL_GetTexture(&hddTPL,hdd,&hddTexObj);
-	TPL_OpenTPLFromMemory(&qoobTPL, (void *)qoob_tpl, qoob_tpl_size);
-	TPL_GetTexture(&qoobTPL,qoob,&qoobTexObj);
-	TPL_OpenTPLFromMemory(&wodeimgTPL, (void *)wodeimg_tpl, wodeimg_tpl_size);
-	TPL_GetTexture(&wodeimgTPL,wodeimg,&wodeimgTexObj);
-	TPL_OpenTPLFromMemory(&wiikeyTPL, (void *)wiikeyimg_tpl, wiikeyimg_tpl_size);
-	TPL_GetTexture(&wiikeyTPL,wiikeyimg,&wiikeyTexObj);
-	TPL_OpenTPLFromMemory(&systemTPL, (void *)systemimg_tpl, systemimg_tpl_size);
-	TPL_GetTexture(&systemTPL,systemimg,&systemTexObj);
-	TPL_OpenTPLFromMemory(&memcardTPL, (void *)memcardimg_tpl, memcardimg_tpl_size);
-	TPL_GetTexture(&memcardTPL,memcardimg,&memcardTexObj);
-	TPL_OpenTPLFromMemory(&usbgeckoTPL, (void *)usbgeckoimg_tpl, usbgeckoimg_tpl_size);
-	TPL_GetTexture(&usbgeckoTPL,usbgeckoimg,&usbgeckoTexObj);
-	TPL_OpenTPLFromMemory(&sambaTPL, (void *)sambaimg_tpl, sambaimg_tpl_size);
-	TPL_GetTexture(&sambaTPL,sambaimg,&sambaTexObj);
-	TPL_OpenTPLFromMemory(&btnnohilightTPL, (void *)btnnohilight_tpl, btnnohilight_tpl_size);
-	TPL_GetTexture(&btnnohilightTPL,btnnohilight,&btnnohilightTexObj);
-	TPL_OpenTPLFromMemory(&btnhilightTPL, (void *)btnhilight_tpl, btnhilight_tpl_size);
-	TPL_GetTexture(&btnhilightTPL,btnhilight,&btnhilightTexObj);
-	TPL_OpenTPLFromMemory(&btndeviceTPL, (void *)btndevice_tpl, btndevice_tpl_size);
-	TPL_GetTexture(&btndeviceTPL,btndevice,&btndeviceTexObj);
-	TPL_OpenTPLFromMemory(&btnsettingsTPL, (void *)btnsettings_tpl, btnsettings_tpl_size);
-	TPL_GetTexture(&btnsettingsTPL,btnsettings,&btnsettingsTexObj);
-	TPL_OpenTPLFromMemory(&btninfoTPL, (void *)btninfo_tpl, btninfo_tpl_size);
-	TPL_GetTexture(&btninfoTPL,btninfo,&btninfoTexObj);
-	TPL_OpenTPLFromMemory(&btnrefreshTPL, (void *)btnrefresh_tpl, btnrefresh_tpl_size);
-	TPL_GetTexture(&btnrefreshTPL,btnrefresh,&btnrefreshTexObj);
-	TPL_OpenTPLFromMemory(&btnexitTPL, (void *)btnexit_tpl, btnexit_tpl_size);
-	TPL_GetTexture(&btnexitTPL,btnexit,&btnexitTexObj);
-	TPL_OpenTPLFromMemory(&boxinnerTPL, (void *)boxinner_tpl, boxinner_tpl_size);
-	TPL_GetTexture(&boxinnerTPL,boxinner,&boxinnerTexObj);
-	GX_InitTexObjWrapMode(&boxinnerTexObj, GX_CLAMP, GX_CLAMP);
-	TPL_OpenTPLFromMemory(&boxouterTPL, (void *)boxouter_tpl, boxouter_tpl_size);
-	TPL_GetTexture(&boxouterTPL,boxouter,&boxouterTexObj);
-	GX_InitTexObjWrapMode(&boxouterTexObj, GX_CLAMP, GX_CLAMP);
-	TPL_OpenTPLFromMemory(&ntscjTPL, (void *)ntscj_tpl, ntscj_tpl_size);
-	TPL_GetTexture(&ntscjTPL,ntscjimg,&ntscjTexObj);
-	TPL_OpenTPLFromMemory(&ntscuTPL, (void *)ntscu_tpl, ntscu_tpl_size);
-	TPL_GetTexture(&ntscuTPL,ntscuimg,&ntscuTexObj);
-	TPL_OpenTPLFromMemory(&palTPL, (void *)pal_tpl, pal_tpl_size);
-	TPL_GetTexture(&palTPL,palimg,&palTexObj);
-	TPL_OpenTPLFromMemory(&checkedTPL, (void *)checked_32_tpl, checked_32_tpl_size);
-	TPL_GetTexture(&checkedTPL,checked_32,&checkedTexObj);
-	TPL_OpenTPLFromMemory(&uncheckedTPL, (void *)unchecked_32_tpl, unchecked_32_tpl_size);
-	TPL_GetTexture(&uncheckedTPL,unchecked_32,&uncheckedTexObj);
+	//TPL_OpenTPLFromMemory(&backdropTPL, (void *)backdrop_tpl, backdrop_tpl_size);
+	//TPL_GetTexture(&backdropTPL,backdrop,&backdropTexObj);
+	//TPL_OpenTPLFromMemory(&btnnohilightTPL, (void *)btnnohilight_tpl, btnnohilight_tpl_size);
+	//TPL_GetTexture(&btnnohilightTPL,btnnohilight,&btnnohilightTexObj);
+	//TPL_OpenTPLFromMemory(&btnhilightTPL, (void *)btnhilight_tpl, btnhilight_tpl_size);
+	//TPL_GetTexture(&btnhilightTPL,btnhilight,&btnhilightTexObj);
+	//TPL_OpenTPLFromMemory(&btndeviceTPL, (void *)btndevice_tpl, btndevice_tpl_size);
+	//TPL_GetTexture(&btndeviceTPL,btndevice,&btndeviceTexObj);
+	//TPL_OpenTPLFromMemory(&btnsettingsTPL, (void *)btnsettings_tpl, btnsettings_tpl_size);
+	//TPL_GetTexture(&btnsettingsTPL,btnsettings,&btnsettingsTexObj);
+	//TPL_OpenTPLFromMemory(&btninfoTPL, (void *)btninfo_tpl, btninfo_tpl_size);
+	//TPL_GetTexture(&btninfoTPL,btninfo,&btninfoTexObj);
+	//TPL_OpenTPLFromMemory(&btnrefreshTPL, (void *)btnrefresh_tpl, btnrefresh_tpl_size);
+	//TPL_GetTexture(&btnrefreshTPL,btnrefresh,&btnrefreshTexObj);
+	//TPL_OpenTPLFromMemory(&btnexitTPL, (void *)btnexit_tpl, btnexit_tpl_size);
+	//TPL_GetTexture(&btnexitTPL,btnexit,&btnexitTexObj);
+	//TPL_OpenTPLFromMemory(&boxinnerTPL, (void *)boxinner_tpl, boxinner_tpl_size);
+	//TPL_GetTexture(&boxinnerTPL,boxinner,&boxinnerTexObj);
+	//GX_InitTexObjWrapMode(&boxinnerTexObj, GX_CLAMP, GX_CLAMP);
+	//TPL_OpenTPLFromMemory(&boxouterTPL, (void *)boxouter_tpl, boxouter_tpl_size);
+	//TPL_GetTexture(&boxouterTPL,boxouter,&boxouterTexObj);
+	//GX_InitTexObjWrapMode(&boxouterTexObj, GX_CLAMP, GX_CLAMP);
+	//TPL_OpenTPLFromMemory(&ntscjTPL, (void *)ntscj_tpl, ntscj_tpl_size);
+	//TPL_GetTexture(&ntscjTPL,ntscj,&ntscjTexObj);
+	//TPL_OpenTPLFromMemory(&ntscuTPL, (void *)ntscu_tpl, ntscu_tpl_size);
+	//TPL_GetTexture(&ntscuTPL,ntscu,&ntscuTexObj);
+	//TPL_OpenTPLFromMemory(&palTPL, (void *)pal_tpl, pal_tpl_size);
+	//TPL_GetTexture(&palTPL,pal,&palTexObj);
+	//TPL_OpenTPLFromMemory(&checkedTPL, (void *)checked_32_tpl, checked_32_tpl_size);
+	//TPL_GetTexture(&checkedTPL,checked_32,&checkedTexObj);
+	//TPL_OpenTPLFromMemory(&uncheckedTPL, (void *)unchecked_32_tpl, unchecked_32_tpl_size);
+	//TPL_GetTexture(&uncheckedTPL,unchecked_32,&uncheckedTexObj);
 }
 
 void drawInit()
@@ -235,36 +195,6 @@ void DrawImage(int textureId, int x, int y, int width, int height, int depth, fl
 	{
 	case TEX_BACKDROP:
 		GX_LoadTexObj(&backdropTexObj, GX_TEXMAP0);
-		break;
-	case TEX_GCDVDSMALL:
-		GX_LoadTexObj(&gcdvdsmallTexObj, GX_TEXMAP0);
-		break;
-	case TEX_SDSMALL:
-		GX_LoadTexObj(&sdsmallTexObj, GX_TEXMAP0);
-		break;
-	case TEX_HDD:
-		GX_LoadTexObj(&hddTexObj, GX_TEXMAP0);
-		break;
-	case TEX_QOOB:
-		GX_LoadTexObj(&qoobTexObj, GX_TEXMAP0);
-		break;
-	case TEX_WODEIMG:
-		GX_LoadTexObj(&wodeimgTexObj, GX_TEXMAP0);
-		break;
-	case TEX_USBGECKO:
-		GX_LoadTexObj(&usbgeckoTexObj, GX_TEXMAP0);
-		break;
-	case TEX_WIIKEY:
-		GX_LoadTexObj(&wiikeyTexObj, GX_TEXMAP0);
-		break;
-	case TEX_SYSTEM:
-		GX_LoadTexObj(&systemTexObj, GX_TEXMAP0);
-		break;
-	case TEX_MEMCARD:
-		GX_LoadTexObj(&memcardTexObj, GX_TEXMAP0);
-		break;
-	case TEX_SAMBA:
-		GX_LoadTexObj(&sambaTexObj, GX_TEXMAP0);
 		break;
 	case TEX_BTNNOHILIGHT:
 		GX_LoadTexObj(&btnnohilightTexObj, GX_TEXMAP0);

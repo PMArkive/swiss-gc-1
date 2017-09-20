@@ -258,9 +258,9 @@ s32 deviceHandler_WKF_init(file_handle* file){
 	if(ret) {
 		if(deviceHandler_getStatEnabled()) {
 			memset(&buf, 0, sizeof(statvfs));
-			DrawFrameStart();
-			DrawMessageBox(D_INFO,"Reading filesystem info for wkf:/");
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//DrawMessageBox(D_INFO,"Reading filesystem info for wkf:/");
+			//DrawFrameFinish();
 			
 			int res = statvfs("wkf:/", &buf);
 			initial_WKF_info.freeSpaceInKB = !res ? (u32)((uint64_t)((uint64_t)buf.f_bsize*(uint64_t)buf.f_bfree)/1024LL):0;
@@ -294,11 +294,16 @@ bool deviceHandler_WKF_test() {
 	return swissSettings.hasDVDDrive && (__wkfSpiReadId() != 0 && __wkfSpiReadId() != 0xFFFFFFFF);
 }
 
+deviceImage wkfImage = {(void *)wiikey_tpl, 0, 102, 80};
+deviceImage* deviceHandler_WKF_deviceImage() { 
+	wkfImage.tplSize = wiikey_tpl_size;
+	return &wkfImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_wkf = {
 	DEVICE_ID_B,
 	"Wiikey / Wasp Fusion",
 	"Supported File System(s): FAT16, FAT32",
-	{TEX_WIIKEY, 102, 80},
 	FEAT_READ|FEAT_BOOT_GCM|FEAT_AUTOLOAD_DOL|FEAT_FAT_FUNCS|FEAT_BOOT_DEVICE|FEAT_CAN_READ_PATCHES,
 	LOC_DVD_CONNECTOR,
 	&initial_WKF,
@@ -312,5 +317,6 @@ DEVICEHANDLER_INTERFACE __device_wkf = {
 	(_fn_seekFile)&deviceHandler_WKF_seekFile,
 	(_fn_setupFile)&deviceHandler_WKF_setupFile,
 	(_fn_closeFile)&deviceHandler_WKF_closeFile,
-	(_fn_deinit)&deviceHandler_WKF_deinit
+	(_fn_deinit)&deviceHandler_WKF_deinit,
+	(_fn_deviceImage)&deviceHandler_WKF_deviceImage
 };

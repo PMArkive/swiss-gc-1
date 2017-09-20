@@ -65,9 +65,9 @@ device_info* deviceHandler_SMB_info() {
 void readDeviceInfoSMB() {
 	struct statvfs buf;
 	memset(&buf, 0, sizeof(statvfs));
-	DrawFrameStart();
-	DrawMessageBox(D_INFO,"Reading filesystem info for smb:/");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawMessageBox(D_INFO,"Reading filesystem info for smb:/");
+	//DrawFrameFinish();
 	
 	int res = statvfs("smb:/", &buf);
 	initial_SMB_info.freeSpaceInKB = !res ? (u32)((uint64_t)((uint64_t)buf.f_bsize*(uint64_t)buf.f_bfree)/1024LL):0;
@@ -96,19 +96,19 @@ s32 deviceHandler_SMB_readDir(file_handle* ffile, file_handle** dir, u32 type){
    
 	// We need at least a share name and ip addr in the settings filled out
 	if(!strlen(&swissSettings.smbShare[0]) || !strlen(&swissSettings.smbServerIp[0])) {
-		DrawFrameStart();
-		sprintf(txtbuffer, "Check Samba Configuration");
-		DrawMessageBox(D_FAIL,txtbuffer);
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//sprintf(txtbuffer, "Check Samba Configuration");
+		//DrawMessageBox(D_FAIL,txtbuffer);
+		//DrawFrameFinish();
 		wait_press_A();
 		return SMB_SMBCFGERR;
 	}
 
 	if(!net_initialized) {       //Init if we have to
-		DrawFrameStart();
-		sprintf(txtbuffer, "Network has not been initialised");
-		DrawMessageBox(D_FAIL,txtbuffer);
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//sprintf(txtbuffer, "Network has not been initialised");
+		//DrawMessageBox(D_FAIL,txtbuffer);
+		//DrawFrameFinish();
 		wait_press_A();
 		return SMB_NETINITERR;
 	} 
@@ -116,10 +116,10 @@ s32 deviceHandler_SMB_readDir(file_handle* ffile, file_handle** dir, u32 type){
 	if(!smb_initialized) {       //Connect to the share
 		init_samba();
 		if(!smb_initialized) {
-			DrawFrameStart();
-			sprintf(txtbuffer, "Error initialising Samba");
-			DrawMessageBox(D_FAIL,txtbuffer);
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//sprintf(txtbuffer, "Error initialising Samba");
+			//DrawMessageBox(D_FAIL,txtbuffer);
+			//DrawFrameFinish();
 			wait_press_A();
 			return SMB_SMBERR; //fail
 		}
@@ -223,11 +223,16 @@ bool deviceHandler_SMB_test() {
 	return exi_bba_exists();
 }
 
+deviceImage smbImage = {(void *)samba_tpl, 0, 160, 85};
+deviceImage* deviceHandler_SMB_deviceImage() {
+	smbImage.tplSize = samba_tpl_size;
+	return &smbImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_smb = {
 	DEVICE_ID_8,
 	"Samba via BBA",
 	"Must be pre-configured via swiss.ini",
-	{TEX_SAMBA, 160, 85},
 	FEAT_READ,
 	LOC_SERIAL_PORT_1,
 	&initial_SMB,
@@ -241,5 +246,6 @@ DEVICEHANDLER_INTERFACE __device_smb = {
 	(_fn_seekFile)&deviceHandler_SMB_seekFile,
 	(_fn_setupFile)NULL,
 	(_fn_closeFile)&deviceHandler_SMB_closeFile,
-	(_fn_deinit)&deviceHandler_SMB_deinit
+	(_fn_deinit)&deviceHandler_SMB_deinit,
+	(_fn_deviceImage)&deviceHandler_SMB_deviceImage
 };

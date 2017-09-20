@@ -411,3 +411,17 @@ int show_settings(file_handle *file, ConfigEntry *config) {
 			{ VIDEO_WaitVSync (); }
 	}
 }
+
+void settings_init() {
+	// Setup defaults
+	memset(&swissSettings, 0 , sizeof(SwissSettings));
+	// Sane defaults
+	refreshSRAM();
+	swissSettings.debugUSB = 0;
+	swissSettings.gameVMode = 0;	// Auto video mode
+	swissSettings.exiSpeed = 1;		// 32MHz
+	swissSettings.uiVMode = 0; 		// Auto UI mode
+	swissSettings.enableFileManagement = 0;
+
+	config_copy_swiss_settings(&swissSettings);
+}

@@ -50,9 +50,9 @@ s32 deviceHandler_USBGecko_readDir(file_handle* ffile, file_handle** dir, u32 ty
 		strcpy((*dir)[0].name, "..");
 	}
 	
-	DrawFrameStart();
-	DrawMessageBox(D_INFO,"Read directory!");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawMessageBox(D_INFO,"Read directory!");
+	//DrawFrameFinish();
 	// Read each entry of the directory
 	s32 res = usbgecko_open_dir(&ffile->name[0]);
 	if(!res) return -1;
@@ -113,15 +113,15 @@ s32 deviceHandler_USBGecko_setupFile(file_handle* file, file_handle* file2) {
 }
 
 s32 deviceHandler_USBGecko_init(file_handle* file) {
-	DrawFrameStart();
-	DrawMessageBox(D_INFO,"Looking for USBGecko in Slot B");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawMessageBox(D_INFO,"Looking for USBGecko in Slot B");
+	//DrawFrameFinish();
 	if(usb_isgeckoalive(1)) {
 		s32 retries = 1000;
 		
-		DrawFrameStart();
-		DrawMessageBox(D_INFO,"Waiting for PC ...");
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//DrawMessageBox(D_INFO,"Waiting for PC ...");
+		//DrawFrameFinish();
 		
 		usb_flush(1);
 		usbgecko_lock_file(0);
@@ -131,16 +131,16 @@ s32 deviceHandler_USBGecko_init(file_handle* file) {
 			retries--;
 		}
 		if(!retries) {
-			DrawFrameStart();
-			DrawMessageBox(D_INFO,"Couldn't find PC!");
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//DrawMessageBox(D_INFO,"Couldn't find PC!");
+			//DrawFrameFinish();
 			sleep(5);
 			return 0;	// Didn't find the PC
 		}
 		else {
-			DrawFrameStart();
-			DrawMessageBox(D_INFO,"Found PC !!");
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//DrawMessageBox(D_INFO,"Found PC !!");
+			//DrawFrameFinish();
 			return 1;
 		}
 	}
@@ -165,11 +165,16 @@ bool deviceHandler_USBGecko_test() {
 	return usb_isgeckoalive(1);
 }
 
+deviceImage usbImage = {(void *)usbgecko_tpl, 0, 129, 80};
+deviceImage* deviceHandler_USBGecko_deviceImage() {
+	usbImage.tplSize = usbgecko_tpl_size;
+	return &usbImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_usbgecko = {
 	DEVICE_ID_A,
 	"USB Gecko - Slot B only",
 	"Requires PC application to be up",
-	{TEX_USBGECKO, 129, 80},
 	FEAT_READ|FEAT_BOOT_GCM,
 	LOC_MEMCARD_SLOT_B,
 	&initial_USBGecko,
@@ -183,5 +188,6 @@ DEVICEHANDLER_INTERFACE __device_usbgecko = {
 	(_fn_seekFile)&deviceHandler_USBGecko_seekFile,
 	(_fn_setupFile)&deviceHandler_USBGecko_setupFile,
 	(_fn_closeFile)&deviceHandler_USBGecko_closeFile,
-	(_fn_deinit)&deviceHandler_USBGecko_deinit
+	(_fn_deinit)&deviceHandler_USBGecko_deinit,
+	(_fn_deviceImage)&deviceHandler_USBGecko_deviceImage
 };

@@ -134,9 +134,9 @@ char *dvd_error_str()
 
 int initialize_disc(u32 streaming) {
 	int patched = NORMAL_MODE;
-	DrawFrameStart();
-	DrawProgressBar(33, "DVD Is Initializing");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawProgressBar(33, "DVD Is Initializing");
+	//DrawFrameFinish();
 	if(is_gamecube())
 	{
 		// Reset WKF hard to allow for a real disc to be read if SD is removed
@@ -147,16 +147,16 @@ int initialize_disc(u32 streaming) {
 			wkfDetected = 1;
 		}
 
-		DrawFrameStart();
-		DrawProgressBar(40, "Resetting DVD drive - Detect Media");
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//DrawProgressBar(40, "Resetting DVD drive - Detect Media");
+		//DrawFrameFinish();
 		dvd_reset();
 		dvd_read_id();
 		// Avoid lid open scenario
 		if((dvd_get_error()>>24) && (dvd_get_error()>>24 != 1)) {
-			DrawFrameStart();
-			DrawProgressBar(75, "Possible DVD Backup - Enabling Patches");
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//DrawProgressBar(75, "Possible DVD Backup - Enabling Patches");
+			//DrawFrameFinish();
 			dvd_enable_patches();
 			if(!dvd_get_error()) {
 				patched=DEBUG_MODE;
@@ -164,10 +164,10 @@ int initialize_disc(u32 streaming) {
 			}
 		}
 		else if((dvd_get_error()>>24) == 1) {  // Lid is open, tell the user!
-			DrawFrameStart();
-			sprintf(txtbuffer, "Error %s. Press A.",dvd_error_str());
-			DrawMessageBox(D_FAIL, txtbuffer);
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//sprintf(txtbuffer, "Error %s. Press A.",dvd_error_str());
+			//DrawMessageBox(D_FAIL, txtbuffer);
+			//DrawFrameFinish();
 			wait_press_A();
 			return DRV_ERROR;
 		}
@@ -191,17 +191,17 @@ int initialize_disc(u32 streaming) {
 	}
 	dvd_read_id();
 	if(dvd_get_error()) { //no disc, or no game id.
-		DrawFrameStart();
-		sprintf(txtbuffer, "Error: %s",dvd_error_str());
-		DrawMessageBox(D_FAIL, txtbuffer);
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//sprintf(txtbuffer, "Error: %s",dvd_error_str());
+		//DrawMessageBox(D_FAIL, txtbuffer);
+		//DrawFrameFinish();
 		wait_press_A();
 		dvd_reset();	// for good measure
 		return DRV_ERROR;
 	}
-	DrawFrameStart();
-	DrawProgressBar(100, "Initialization Complete");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawProgressBar(100, "Initialization Complete");
+	//DrawFrameFinish();
 	return patched;
 }
 
@@ -389,9 +389,9 @@ s32 deviceHandler_DVD_setupFile(file_handle* file, file_handle* file2) {
 		devices[DEVICE_CUR]->readFile(file,(unsigned char*)0x80000000,32);
 		char streaming = *(char*)0x80000008;
 		if(streaming && !isXenoGC) {
-			DrawFrameStart();
-			DrawMessageBox(D_INFO,"One moment, setting up audio streaming.");
-			DrawFrameFinish();
+			//DrawFrameStart();
+			//DrawMessageBox(D_INFO,"One moment, setting up audio streaming.");
+			//DrawFrameFinish();
 			dvd_motor_off();
 			print_gecko("Set extension %08X\r\n",dvd_get_error());
 			dvd_setextension();
@@ -478,9 +478,9 @@ s32 deviceHandler_DVD_setupFile(file_handle* file, file_handle* file2) {
 s32 deviceHandler_DVD_init(file_handle* file){
   file->status = initialize_disc(ENABLE_BYDISK);
   if(file->status == DRV_ERROR){
-	  DrawFrameStart();
-	  DrawMessageBox(D_FAIL,"Failed to mount DVD. Press A");
-	  DrawFrameFinish();
+	 //DrawFrameStart();
+	 //DrawMessageBox(D_FAIL,"Failed to mount DVD. Press A");
+	 //DrawFrameFinish();
 	  wait_press_A();
 	  return file->status;
   }
@@ -502,11 +502,16 @@ bool deviceHandler_DVD_test() {
 	return swissSettings.hasDVDDrive != 0;
 }
 
+deviceImage dvdImage = {(void *)gcdvdsmall_tpl, 0, 80, 79};
+deviceImage* deviceHandler_DVD_deviceImage() {
+	dvdImage.tplSize = gcdvdsmall_tpl_size;
+	return &dvdImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_dvd = {
 	DEVICE_ID_0,
 	"DVD",
 	"Supported File System(s): GCM, ISO 9660, Multi-Game",
-	{TEX_GCDVDSMALL, 80, 79},
 	FEAT_READ|FEAT_BOOT_GCM|FEAT_BOOT_DEVICE|FEAT_CAN_READ_PATCHES,
 	LOC_DVD_CONNECTOR,
 	&initial_DVD,
@@ -520,5 +525,6 @@ DEVICEHANDLER_INTERFACE __device_dvd = {
 	(_fn_seekFile)&deviceHandler_DVD_seekFile,
 	(_fn_setupFile)&deviceHandler_DVD_setupFile,
 	(_fn_closeFile)&deviceHandler_DVD_closeFile,
-	(_fn_deinit)&deviceHandler_DVD_deinit
+	(_fn_deinit)&deviceHandler_DVD_deinit,
+	(_fn_deviceImage)&deviceHandler_DVD_deviceImage
 };

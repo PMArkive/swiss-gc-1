@@ -40,10 +40,11 @@ typedef struct {
 } device_info;
 
 typedef struct {
-	int textureId;
+	void *tpl;
+	u32 tplSize;
 	u32 width;
 	u32 height;
-} textureImage;
+} deviceImage;
 
 #define DEVICE_HANDLER_SEEK_SET 0
 #define DEVICE_HANDLER_SEEK_CUR 1
@@ -60,7 +61,7 @@ typedef s32 (* _fn_seekFile)(file_handle*,  u32, u32);
 typedef s32 (* _fn_setupFile)(file_handle*, file_handle*);
 typedef s32 (* _fn_closeFile)(file_handle*);
 typedef s32 (* _fn_deinit)(file_handle*);
-typedef device_info* (* _fn_deviceInfo)(void);
+typedef s32 (* _fn_deviceImage)(void);
 
 // Device features
 #define FEAT_READ				0x1
@@ -103,7 +104,6 @@ struct DEVICEHANDLER_STRUCT {
 	u8 				deviceUniqueId;
 	const char*		deviceName;
 	const char*		deviceDescription;
-	textureImage	deviceTexture;
 	u32				features;
 	u32				location;
 	file_handle*	initial;
@@ -118,6 +118,7 @@ struct DEVICEHANDLER_STRUCT {
 	_fn_setupFile	setupFile;
 	_fn_closeFile	closeFile;
 	_fn_deinit		deinit;
+	_fn_deviceImage	deviceImage;
 } ;
 
 typedef struct DEVICEHANDLER_STRUCT DEVICEHANDLER_INTERFACE;
@@ -142,19 +143,38 @@ enum DEVICE_SLOTS {
 #include "devices/system/deviceHandler-SYS.h"
 #include "devices/ftp/deviceHandler-FTP.h"
 
-extern void deviceHandler_setStatEnabled(int enable);
-extern int deviceHandler_getStatEnabled();
-extern bool deviceHandler_getDeviceAvailable(DEVICEHANDLER_INTERFACE *dev);
-extern void deviceHandler_setDeviceAvailable(DEVICEHANDLER_INTERFACE *dev, bool availability);
-extern void deviceHandler_setAllDevicesAvailable();
+#ifdef __cplusplus
+#define EXTERNC extern "C"
+#else
+#define EXTERNC
+#endif
 
-extern DEVICEHANDLER_INTERFACE* allDevices[MAX_DEVICES];
-extern DEVICEHANDLER_INTERFACE* devices[MAX_DEVICES];
+// Device Images
+#include "gcdvdsmall_tpl.h"
+#include "sdsmall_tpl.h"
+#include "hdd_tpl.h"
+#include "qoob_tpl.h"
+#include "wodeimg_tpl.h"
+#include "wiikey_tpl.h"
+#include "systemimg_tpl.h"
+#include "usbgecko_tpl.h"
+#include "memcard_tpl.h"
+#include "samba_tpl.h"
 
-extern int deviceHandler_test(DEVICEHANDLER_INTERFACE *device);
-extern DEVICEHANDLER_INTERFACE* getDeviceByUniqueId(u8 id);
 
-extern void print_frag_list(int hasDisc2);
+EXTERNC void deviceHandler_setStatEnabled(int enable);
+EXTERNC int deviceHandler_getStatEnabled();
+EXTERNC bool deviceHandler_getDeviceAvailable(DEVICEHANDLER_INTERFACE *dev);
+EXTERNC void deviceHandler_setDeviceAvailable(DEVICEHANDLER_INTERFACE *dev, bool availability);
+EXTERNC void deviceHandler_setAllDevicesAvailable();
+
+EXTERNC DEVICEHANDLER_INTERFACE* allDevices[MAX_DEVICES];
+EXTERNC DEVICEHANDLER_INTERFACE* devices[MAX_DEVICES];
+
+EXTERNC int deviceHandler_test(DEVICEHANDLER_INTERFACE *device);
+EXTERNC DEVICEHANDLER_INTERFACE* getDeviceByUniqueId(u8 id);
+
+EXTERNC void print_frag_list(int hasDisc2);
 
 #endif
 

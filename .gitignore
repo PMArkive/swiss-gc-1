@@ -19,3 +19,4 @@ pc/usbgecko/core.*
 *.d
 *.map
 *.gcm
+*.scf

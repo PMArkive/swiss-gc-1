@@ -7,6 +7,7 @@
 #include "deviceHandler-SYS.h"
 #include "main.h"
 #include "dvd.h"
+#include "../deviceHandler.h"
 #include "gui/FrameBufferMagic.h"
 
 int read_rom_ipl(unsigned int offset, void* buffer, unsigned int length);
@@ -293,11 +294,16 @@ bool deviceHandler_SYS_test() {
 	return true;
 }
 
+deviceImage sysImage = {(void *)systemimg_tpl, 0, 160, 85};
+deviceImage* deviceHandler_SYS_deviceImage() {
+	sysImage.tplSize = systemimg_tpl_size;
+	return &sysImage;
+}
+
 DEVICEHANDLER_INTERFACE __device_sys = {
 	DEVICE_ID_9,
 	"System",
 	"Backup IPL, DSP, DVD, SRAM",
-	{TEX_SYSTEM, 160, 85}, 
 	FEAT_READ,
 	LOC_SYSTEM,
 	&initial_SYS,
@@ -311,5 +317,6 @@ DEVICEHANDLER_INTERFACE __device_sys = {
 	(_fn_seekFile)&deviceHandler_SYS_seekFile,
 	(_fn_setupFile)&deviceHandler_SYS_setupFile,
 	(_fn_closeFile)&deviceHandler_SYS_closeFile,
-	(_fn_deinit)&deviceHandler_SYS_deinit
+	(_fn_deinit)&deviceHandler_SYS_deinit,
+	(_fn_deviceImage)&deviceHandler_SYS_deviceImage
 };

@@ -76,87 +76,40 @@ bool checkExtension(char *filename) {
 	return false;
 }
 
-static void ProperScanPADS()	{
-	PAD_ScanPads(); 
-}
 
-void populateVideoStr(GXRModeObj *vmode) {
+char* getVideoStr(GXRModeObj *vmode) {
 	switch(vmode->viTVMode) {
-		case VI_TVMODE_NTSC_INT:     videoStr = NtscIntStr;     break;
-		case VI_TVMODE_NTSC_DS:      videoStr = NtscDsStr;      break;
-		case VI_TVMODE_NTSC_PROG:    videoStr = NtscProgStr;    break;
-		case VI_TVMODE_PAL_INT:      videoStr = PalIntStr;      break;
-		case VI_TVMODE_PAL_DS:       videoStr = PalDsStr;       break;
-		case VI_TVMODE_PAL_PROG:     videoStr = PalProgStr;     break;
-		case VI_TVMODE_MPAL_INT:     videoStr = MpalIntStr;     break;
-		case VI_TVMODE_MPAL_DS:      videoStr = MpalDsStr;      break;
-		case VI_TVMODE_MPAL_PROG:    videoStr = MpalProgStr;    break;
-		case VI_TVMODE_EURGB60_INT:  videoStr = Eurgb60IntStr;  break;
-		case VI_TVMODE_EURGB60_DS:   videoStr = Eurgb60DsStr;   break;
-		case VI_TVMODE_EURGB60_PROG: videoStr = Eurgb60ProgStr; break;
-		default:                     videoStr = UnkStr;
+		case VI_TVMODE_NTSC_INT:     return NtscIntStr;    
+		case VI_TVMODE_NTSC_DS:      return NtscDsStr;     
+		case VI_TVMODE_NTSC_PROG:    return NtscProgStr;   
+		case VI_TVMODE_PAL_INT:      return PalIntStr;     
+		case VI_TVMODE_PAL_DS:       return PalDsStr;      
+		case VI_TVMODE_PAL_PROG:     return PalProgStr;    
+		case VI_TVMODE_MPAL_INT:     return MpalIntStr;    
+		case VI_TVMODE_MPAL_DS:      return MpalDsStr;     
+		case VI_TVMODE_MPAL_PROG:    return MpalProgStr;   
+		case VI_TVMODE_EURGB60_INT:  return Eurgb60IntStr; 
+		case VI_TVMODE_EURGB60_DS:   return Eurgb60DsStr;  
+		case VI_TVMODE_EURGB60_PROG: return Eurgb60ProgStr;
+		default:                     return UnkStr;
 	}
 }
 
-void initialise_video(GXRModeObj *m) {
-	VIDEO_Configure (m);
-	if(xfb[0]) free(MEM_K1_TO_K0(xfb[0]));
-	if(xfb[1]) free(MEM_K1_TO_K0(xfb[1]));
-	xfb[0] = (u32 *) MEM_K0_TO_K1 (SYS_AllocateFramebuffer (m));
-	xfb[1] = (u32 *) MEM_K0_TO_K1 (SYS_AllocateFramebuffer (m));
-	VIDEO_ClearFrameBuffer (m, xfb[0], COLOR_BLACK);
-	VIDEO_ClearFrameBuffer (m, xfb[1], COLOR_BLACK);
-	VIDEO_SetNextFramebuffer (xfb[0]);
-	VIDEO_SetPostRetraceCallback (ProperScanPADS);
-	VIDEO_SetBlack (0);
-	VIDEO_Flush ();
-	VIDEO_WaitVSync ();
-	if (m->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
-	else while (VIDEO_GetNextField())   VIDEO_WaitVSync();
-	
-	// setup the fifo and then init GX
-	if(gp_fifo == NULL) {
-		gp_fifo = MEM_K0_TO_K1 (memalign (32, DEFAULT_FIFO_SIZE));
-		memset (gp_fifo, 0, DEFAULT_FIFO_SIZE);
-		GX_Init (gp_fifo, DEFAULT_FIFO_SIZE);
-	}
-	// clears the bg to color and clears the z buffer
-	GX_SetCopyClear ((GXColor) {0, 0, 0, 0xFF}, GX_MAX_Z24);
-	// init viewport
-	GX_SetViewport (0, 0, m->fbWidth, m->efbHeight, 0, 1);
-	// Set the correct y scaling for efb->xfb copy operation
-	GX_SetDispCopyYScale ((f32) m->xfbHeight / (f32) m->efbHeight);
-	GX_SetDispCopySrc (0, 0, m->fbWidth, m->efbHeight);
-	GX_SetDispCopyDst (m->fbWidth, m->xfbHeight);
-	GX_SetCopyFilter (m->aa, m->sample_pattern, GX_TRUE, m->vfilter);
-	GX_SetFieldMode (m->field_rendering, ((m->viHeight == 2 * m->xfbHeight) ? GX_ENABLE : GX_DISABLE));
-	if (m->aa)
-		GX_SetPixelFmt(GX_PF_RGB565_Z16, GX_ZC_LINEAR);
-	else
-		GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
-	GX_SetCullMode (GX_CULL_NONE); // default in rsp init
-	GX_CopyDisp (xfb[0], GX_TRUE); // This clears the efb
-	GX_CopyDisp (xfb[0], GX_TRUE); // This clears the xfb
-}
-
-/* Initialise Video, PAD, DVD, Font */
-void* Initialise (void)
+/* get the preferred video mode */
+GXRModeObj* swiss_get_videomode()
 {
-	VIDEO_Init ();
-	PAD_Init ();  
-	DVD_Init(); 
-	*(volatile unsigned long*)0xcc00643c = 0x00000000; //allow 32mhz exi bus
+	// Swiss video mode force
+	GXRModeObj *forcedMode = getModeFromSwissSetting(swissSettings.uiVMode);
 	
-	// Disable IPL modchips to allow access to IPL ROM fonts
-	ipl_set_config(6); 
-	usleep(1000); //wait for modchip to disable (overkill)
-	
+	if(forcedMode != NULL) {
+		return forcedMode;
+	}
 	
 	__SYS_ReadROM(IPLInfo,256,0);	// Read IPL tag
 
 	// Wii has no IPL tags for "PAL" so let libOGC figure out the video mode
 	if(!is_gamecube()) {
-		vmode = VIDEO_GetPreferredMode(NULL); //Last mode used
+		return VIDEO_GetPreferredMode(NULL); //Last mode used
 	}
 	else {	// Gamecube, determine based on IPL
 		int retPAD = 0, retCnt = 10000;
@@ -165,74 +118,41 @@ void* Initialise (void)
 		if(VIDEO_HaveComponentCable() && !(PAD_ButtonsDown(0) & PAD_TRIGGER_L)) {
 			if(strstr(IPLInfo,"MPAL")!=NULL) {
 				swissSettings.sramVideo = 2;
-				vmode = &TVMpal480Prog; //Progressive 480p
+				return &TVMpal480Prog; //Progressive 480p
 			}
 			else if((strstr(IPLInfo,"PAL")!=NULL)) {
 				swissSettings.sramVideo = 1;
-				vmode = &TVPal576ProgScale; //Progressive 576p
+				return &TVPal576ProgScale; //Progressive 576p
 			}
 			else {
 				swissSettings.sramVideo = 0;
-				vmode = &TVNtsc480Prog; //Progressive 480p
+				return &TVNtsc480Prog; //Progressive 480p
 			}
 		}
 		else {
 			//try to use the IPL region
 			if(strstr(IPLInfo,"MPAL")!=NULL) {
 				swissSettings.sramVideo = 2;
-				vmode = &TVMpal480IntDf;        //PAL-M
+				return &TVMpal480IntDf;        //PAL-M
 			}
 			else if(strstr(IPLInfo,"PAL")!=NULL) {
 				swissSettings.sramVideo = 1;
-				vmode = &TVPal576IntDfScale;         //PAL
+				return &TVPal576IntDfScale;         //PAL
 			}
 			else {
 				swissSettings.sramVideo = 0;
-				vmode = &TVNtsc480IntDf;        //NTSC
+				return &TVNtsc480IntDf;        //NTSC
 			}
 		}
 	}
-	initialise_video(vmode);
-	populateVideoStr(vmode);
-
-	init_font();
-	init_textures();
-	whichfb = 0;
-	
-	drive_version(&driveVersion[0]);
-	swissSettings.hasDVDDrive = *(u32*)&driveVersion[0] ? 1 : 0;
-	
-	if(!driveVersion[0]) {
-		// Reset DVD if there was a modchip
-		DrawFrameStart();
-		WriteFontStyled(640/2, 250, "Initialise DVD .. (HOLD B if NO DVD Drive)", 0.8f, true, defaultColor);
-		DrawFrameFinish();
-		dvd_reset();	// low-level, basic
-		dvd_read_id();
-		if(!(PAD_ButtonsHeld(0) & PAD_BUTTON_B)) {
-			dvd_set_streaming(*(char*)0x80000008);
-		}
-		drive_version(&driveVersion[0]);
-		swissSettings.hasDVDDrive = *(u32*)&driveVersion[0] ? 1 : 0;
-		if(!swissSettings.hasDVDDrive) {
-			DrawFrameStart();
-			DrawMessageBox(D_INFO, "No DVD Drive Detected !!");
-			DrawFrameFinish();
-			sleep(2);
-		}
-	}
-	
-	return xfb[0];
 }
 
 void load_config() {
 
 	// Try to open up the config .ini in case it hasn't been opened already
 	if(config_init()) {
-		DrawFrameStart();
 		sprintf(txtbuffer,"Loaded %i entries from the config file",config_get_count());
-		DrawMessageBox(D_INFO,txtbuffer);
-		DrawFrameFinish();
+		print_gecko("%s\r\n",txtbuffer);
 		memcpy(&swissSettings, config_get_swiss_settings(), sizeof(SwissSettings));
 	}
 }
@@ -431,14 +351,18 @@ void main_loop()
 	}
 }
 
-
+#include "menu.h"
 /****************************************************************************
 * Main
 ****************************************************************************/
-int main () 
+void swiss_init(void) 
 {
-	// Setup defaults (if no config is found)
-	memset(&swissSettings, 0 , sizeof(SwissSettings));
+	*(volatile unsigned long*)0xcc00643c = 0x00000000; //allow 32mhz exi bus
+	
+	// Disable IPL modchips to allow access to IPL ROM fonts
+	ipl_set_config(6); 
+	usleep(1000); //wait for modchip to disable (overkill)
+	DVD_Init();
 
 	// Register all devices supported (order matters for boot devices)
 	int i = 0;
@@ -460,7 +384,7 @@ int main ()
 	allDevices[i++] = &__device_usbgecko;
 	allDevices[i++] = &__device_ftp;
 	allDevices[i++] = NULL;
-	
+
 	// Set current devices
 	devices[DEVICE_CUR] = NULL;
 	devices[DEVICE_DEST] = NULL;
@@ -468,23 +392,36 @@ int main ()
 	devices[DEVICE_CONFIG] = NULL;
 	devices[DEVICE_PATCHES] = NULL;
 	
-	void *fb;
-	fb = Initialise();
-	if(!fb) {
-		return -1;
+	settings_init();	// Init settings for Swiss
+	
+	//	init_textures();
+	
+	drive_version(&driveVersion[0]);
+	swissSettings.hasDVDDrive = *(u32*)&driveVersion[0] ? 1 : 0;
+	
+	if(!driveVersion[0]) {
+		ShowAction("Initialise DVD .. (HOLD B if NO DVD Drive)");
+		// Reset DVD if there was a modchip
+		dvd_reset();	// low-level, basic
+		dvd_read_id();
+		if(!(PAD_ButtonsHeld(0) & PAD_BUTTON_B)) {
+			dvd_set_streaming(*(char*)0x80000008);
+		}
+		drive_version(&driveVersion[0]);
+		swissSettings.hasDVDDrive = *(u32*)&driveVersion[0] ? 1 : 0;
+		CancelAction();
+		if(!swissSettings.hasDVDDrive && !(PAD_ButtonsHeld(0) & PAD_BUTTON_B)) {
+			ShowAction("No DVD Drive Detected !!");
+			sleep(2);
+			CancelAction();
+		}
+		CancelAction();
 	}
-
-	// Sane defaults
-	refreshSRAM();
-	swissSettings.debugUSB = 0;
-	swissSettings.gameVMode = 0;	// Auto video mode
-	swissSettings.exiSpeed = 1;		// 32MHz
-	swissSettings.uiVMode = 0; 		// Auto UI mode
-	swissSettings.enableFileManagement = 0;
-
-	config_copy_swiss_settings(&swissSettings);
+	
 	needsDeviceChange = 1;
 	needsRefresh = 1;
+	
+	swissSettings.debugUSB = 1;	// TODO remove
 	
 	//debugging stuff
 	if(swissSettings.debugUSB) {
@@ -498,6 +435,7 @@ int main ()
 	}
 	
 	// Go through all devices with FEAT_BOOT_DEVICE feature and set it as current if one is available
+	ShowAction("Checking devices ...");
 	for(i = 0; i < MAX_DEVICES; i++) {
 		if(allDevices[i] != NULL && (allDevices[i]->features & FEAT_BOOT_DEVICE)) {
 			print_gecko("Testing device %s\r\n", allDevices[i]->deviceName);
@@ -508,6 +446,8 @@ int main ()
 			}
 		}
 	}
+	CancelAction();
+	
 	if(devices[DEVICE_CUR] != NULL) {
 		print_gecko("Detected %s\r\n", devices[DEVICE_CUR]->deviceName);
 		devices[DEVICE_CUR]->init(devices[DEVICE_CUR]->initial);
@@ -525,14 +465,13 @@ int main ()
 	
 	// load config
 	load_config();
-	
+	swissSettings.initNetworkAtStart=1;
 	if(swissSettings.initNetworkAtStart) {
 		// Start up the BBA if it exists
-		DrawFrameStart();
-		DrawMessageBox(D_INFO,"Initialising Network");
-		DrawFrameFinish();
+		ShowAction("Initialising Network");
 		init_network();
 		init_httpd_thread();
+		CancelAction();
 	}
 	
 	// DVD Motor off
@@ -540,18 +479,9 @@ int main ()
 		dvd_motor_off();
 	}
 
-	// Swiss video mode force
-	GXRModeObj *forcedMode = getModeFromSwissSetting(swissSettings.uiVMode);
-	
-	if((forcedMode != NULL) && (forcedMode != vmode)) {
-		initialise_video(forcedMode);
-		vmode = forcedMode;
-	}
-
-	while(1) {
-		main_loop();
-	}
-	return 0;
+	//while(1) {
+	//	main_loop();
+	//}
 }
 
 GXRModeObj *getModeFromSwissSetting(int uiVMode) {
@@ -585,14 +515,12 @@ GXRModeObj *getModeFromSwissSetting(int uiVMode) {
 				return &TVPal576IntDfScale;
 			}
 	}
-	return vmode;
+	return NULL;
 }
 
 // Checks if devices are available, prints name of device being detected for slow init devices
 void populateDeviceAvailability() {
-	DrawFrameStart();
-	DrawMessageBox(D_INFO, "Detecting devices ...\nThis can be skipped by holding B next time");
-	DrawFrameFinish();
+	ShowProgress("Detecting devices ...\nThis can be skipped by holding B next time", 0, MAX_DEVICES);
 	if(PAD_ButtonsHeld(0) & PAD_BUTTON_B) {
 		deviceHandler_setAllDevicesAvailable();
 		return;
@@ -607,5 +535,6 @@ void populateDeviceAvailability() {
 			deviceHandler_setAllDevicesAvailable();
 			break;
 		}
+		ShowProgress("Detecting devices ...\nThis can be skipped by holding B next time", i, MAX_DEVICES);
 	}
 }

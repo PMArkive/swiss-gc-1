@@ -155,19 +155,19 @@ void populate_meta(file_handle *f) {
 					if(header) free(header);
 				}
 			}
-			else if(endsWith(f->name,".mp3")) {	//MP3
-				f->meta = create_basic_meta(mp3img_tpl, mp3img_tpl_size);
-			}
-			else if(endsWith(f->name,".dol")) {	//DOL
-				f->meta = create_basic_meta(dolimg_tpl, dolimg_tpl_size);
-			}
-			else {
-				f->meta = create_basic_meta(fileimg_tpl, fileimg_tpl_size);
-			}
+			//else if(endsWith(f->name,".mp3")) {	//MP3
+			//	f->meta = create_basic_meta(mp3_tpl, mp3_tpl_size);
+			//}
+			//else if(endsWith(f->name,".dol")) {	//DOL
+			//	f->meta = create_basic_meta(dol_tpl, dol_tpl_size);
+			//}
+			//else {
+			//	f->meta = create_basic_meta(file_tpl, file_tpl_size);
+			//}
 		}
-		else if (f->fileAttrib == IS_DIR) {
-			f->meta = create_basic_meta(dirimg_tpl, dirimg_tpl_size);
-		}
+		//else if (f->fileAttrib == IS_DIR) {
+		//	f->meta = create_basic_meta(dir_tpl, dir_tpl_size);
+		//}
 	}
 }
 

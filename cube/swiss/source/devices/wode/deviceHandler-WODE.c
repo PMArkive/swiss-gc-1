@@ -36,9 +36,9 @@ device_info initial_WODE_info = {
 	
 int startupWode() {
 	if(OpenWode() == 0) {
-		DrawFrameStart();
-		DrawMessageBox(D_FAIL,"No Wode found! Press A");
-		DrawFrameFinish();
+		//DrawFrameStart();
+		//DrawMessageBox(D_FAIL,"No Wode found! Press A");
+		//DrawFrameFinish();
 		wait_press_A();
 		return -1;
 	}
@@ -52,9 +52,9 @@ device_info* deviceHandler_WODE_info() {
 s32 deviceHandler_WODE_readDir(file_handle* ffile, file_handle** dir, u32 type){	
 
 	if(!wodeInited) return 0;
-	DrawFrameStart();
-	DrawMessageBox(D_INFO,"Reading WODE");
-	DrawFrameFinish();
+	//DrawFrameStart();
+	//DrawMessageBox(D_INFO,"Reading WODE");
+	//DrawFrameFinish();
 	
 	//we don't care about partitions, just files!
 	while(!GetTotalISOs()) {
@@ -132,11 +132,16 @@ bool deviceHandler_WODE_test() {
 	return swissSettings.hasDVDDrive && (*(u32*)&driveVersion[0] == 0x20080714);
 }
 
+deviceImage wodeImage = {(void *)wodeimg_tpl, 0, 146, 72};
+deviceImage* deviceHandler_WODE_deviceImage() {
+	wodeImage.tplSize = wodeimg_tpl_size;
+	return &wodeImage;
+}	
+
 DEVICEHANDLER_INTERFACE __device_wode = {
 	DEVICE_ID_C,
 	"WODE Jukebox",
 	"Supported File System(s): FAT32, NTFS, EXT2/3, HPFS",
-	{TEX_WODEIMG, 146, 72},
 	FEAT_READ|FEAT_BOOT_GCM|FEAT_BOOT_DEVICE,
 	LOC_DVD_CONNECTOR,
 	&initial_WODE,
@@ -150,5 +155,6 @@ DEVICEHANDLER_INTERFACE __device_wode = {
 	(_fn_seekFile)&deviceHandler_WODE_seekFile,
 	(_fn_setupFile)&deviceHandler_WODE_setupFile,
 	(_fn_closeFile)&deviceHandler_WODE_closeFile,
-	(_fn_deinit)&deviceHandler_WODE_deinit
+	(_fn_deinit)&deviceHandler_WODE_deinit,
+	(_fn_deviceImage)&deviceHandler_WODE_deviceImage
 };
